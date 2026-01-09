@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Установка зависимостей
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Копирование исходного кода
+COPY . .
+
+# Порт для dev сервера
+EXPOSE 5173
+
+# Запуск dev сервера
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+

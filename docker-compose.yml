@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: project_finance_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finance_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finance_password}
+      POSTGRES_DB: ${POSTGRES_DB:-finance_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finance_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finance_network
+
+  # Backend API
+  backend:
+    build:
+      context: ./project_finance_backend
+      dockerfile: Dockerfile.dev  # Используем dev версию для разработки
+    container_name: project_finance_backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-finance_user}:${POSTGRES_PASSWORD:-finance_password}@db:5432/${POSTGRES_DB:-finance_db}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL:-http://localhost:5173}
+      APP_NAME: ${APP_NAME:-Finance App}
+      DEBUG: ${DEBUG:-true}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-8000}
+    volumes:
+      - ./project_finance_backend:/app
+      - /app/.venv  # Исключаем виртуальное окружение из volume
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        echo 'Running migrations...' &&
+        python -m alembic upgrade head || echo 'Migrations failed or already applied' &&
+        echo 'Starting server...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./project_finance_front
+      dockerfile: Dockerfile.dev  # Используем dev версию для разработки
+    container_name: project_finance_frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    volumes:
+      - ./project_finance_front:/app
+      - /app/node_modules  # Исключаем node_modules из volume
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  finance_network:
+    driver: bridge
+

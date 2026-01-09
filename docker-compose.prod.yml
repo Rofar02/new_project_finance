@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: project_finance_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Backend API (Production)
+  backend:
+    build:
+      context: ./project_finance_backend
+      dockerfile: Dockerfile
+    container_name: project_finance_backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL}
+      APP_NAME: ${APP_NAME:-Finance App}
+      DEBUG: ${DEBUG:-false}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-8000}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        echo 'Running migrations...' &&
+        python -m alembic upgrade head &&
+        echo 'Starting server...' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+  # Frontend (Production)
+  frontend:
+    build:
+      context: ./project_finance_front
+      dockerfile: Dockerfile
+    container_name: project_finance_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - finance_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  finance_network:
+    driver: bridge
+
