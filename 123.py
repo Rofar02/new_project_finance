@@ -1,58 +1,21 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+import asyncio
+from asyncio import FIRST_COMPLETED
 
 
-app = FastAPI()
+async def greating():
+    await asyncio.sleep(1)
 
-lst = [] # Это типа бд
+    print('HELLOOOO')
 
-class User(BaseModel):
-    id: int
-    name: str
-    email: str
-    password: str
-
-class ReadUser(User):
-    pass
-
-class CreateUser(User):
-    pass
-
-class UpdateUser(BaseModel):
-    id : int = None
-    name : str = None
-    email : str = None
-    password: str = None
-
-class DeleteUser(BaseModel):
-    id: int
-
-@app.post('/users')
-async def create_user(user: CreateUser):
-    if user not in lst:
-        lst.append(user)
-
-    return {'id': user.id, 'name': user.name, 'email': user.email, 'password': ''}
-
-@app.get('/users')
-async def get_users():
-    print(lst)
-    return {'users': lst}
-
-@app.put('/users')
-async def update_user(user: UpdateUser):
-    if user in lst:
-        lst.remove(user)
-    lst.append(user)
-
-    return {'id': user.id, 'name': user.name, 'email': user.email, 'password': ''}
+async def greating1():
+    await asyncio.sleep(3)
+    raise
+    print('HELLOOOO3')
 
 
-@app.delete('/users')
-async def delete_user(user_id: DeleteUser):  # Проще передавать ID параметром
-    for i, existing_user in enumerate(lst):
-        if existing_user.id == user_id.id:
-            lst.pop(i)
-            return {'message': f'user {user_id} deleted'}
+async def main():
+    x = await asyncio.gather(greating(), greating1(),return_exceptions=True)
+    print(x)
 
-    return {"error": "User not found"}
+
+asyncio.run(main())

@@ -6,15 +6,15 @@ services:
     image: postgres:16-alpine
     container_name: project_finance_db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-project_finance}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finance_password}
-      POSTGRES_DB: ${POSTGRES_DB:-finance_db}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: project_finance
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-project_financer}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-project_finance}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,20 +27,23 @@ services:
       context: ./project_finance_backend
       dockerfile: Dockerfile.dev  # Используем dev версию для разработки
     container_name: project_finance_backend
+    extra_hosts:
+      - "localhost:host-gateway"
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-project_finance}:${POSTGRES_PASSWORD:-finance_password}@db:5432/${POSTGRES_DB:-finance_db}
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
-      ALGORITHM: ${ALGORITHM:-HS256}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      TELEGRAM_WEBAPP_URL: ${TELEGRAM_WEBAPP_URL:-http://localhost:5173}
-      APP_NAME: ${APP_NAME:-Finance App}
-      DEBUG: ${DEBUG:-true}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      TELEGRAM_BOT_TOKEN: ${telegram_bot_token}
+      TELEGRAM_WEBAPP_URL: ${telegram_webapp_url}
+      APP_NAME: ${APP_NAME}
+      DEBUG: ${DEBUG}
       HOST: ${HOST:-0.0.0.0}
       PORT: ${PORT:-8000}
     volumes:
       - ./project_finance_backend:/app
       - /app/.venv  # Исключаем виртуальное окружение из volume
+      - ./project_finance_backend/.env:/app/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -84,5 +87,6 @@ volumes:
 networks:
   finance_network:
     driver: bridge
+
 
 
