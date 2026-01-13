@@ -6,7 +6,7 @@ services:
     image: postgres:16-alpine
     container_name: project_finance_db
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-finance_user}
+      POSTGRES_USER: ${POSTGRES_USER:-project_finance}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finance_password}
       POSTGRES_DB: ${POSTGRES_DB:-finance_db}
     volumes:
@@ -14,7 +14,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finance_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-project_financer}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile.dev  # Используем dev версию для разработки
     container_name: project_finance_backend
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-finance_user}:${POSTGRES_PASSWORD:-finance_password}@db:5432/${POSTGRES_DB:-finance_db}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-project_finance}:${POSTGRES_PASSWORD:-finance_password}@db:5432/${POSTGRES_DB:-finance_db}
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       ALGORITHM: ${ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
@@ -84,4 +84,5 @@ volumes:
 networks:
   finance_network:
     driver: bridge
+
 
