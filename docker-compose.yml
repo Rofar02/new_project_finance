@@ -20,7 +20,19 @@ services:
       retries: 5
     networks:
       - finance_network
-
+  nginx-proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - finance_network
   # Backend API
   backend:
     build:
@@ -69,12 +81,11 @@ services:
       dockerfile: Dockerfile.dev  # Используем dev версию для разработки
     container_name: project_finance_frontend
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: https://api.gredzenfinance.ru
     volumes:
       - ./project_finance_front:/app
       - /app/node_modules  # Исключаем node_modules из volume
-    ports:
-      - "5173:5173"
+    
     depends_on:
       - backend
     networks:

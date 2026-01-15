@@ -24,7 +24,24 @@ from app.bot.bot import setup_bot, shutdown_bot, dp, bot
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Управление жизненным циклом приложения"""
+    # --- БЛОК СОЗДАНИЯ ТАБЛИЦ ---
+    try:
+        from app.db import engine  # У тебя файл app/db.py, а не папка
+        from app.models.base import Base # Base у тебя в app/models/base.py
+        
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("DATABASE: Tables created successfully!")
+    except Exception as e:
+        logger.error(f"DATABASE ERROR: {e}")
+    # ----------------------------
+    await setup_bot()
+    bot_task = asyncio.create_task(dp.start_polling(bot, drop_pending_updates=True))
+    yield
+    await dp.stop_polling()
+    await bot.session.close()
+    bot_task.cancel()
+
     # Настраиваем бота (регистрируем handlers)
     await setup_bot()
     
