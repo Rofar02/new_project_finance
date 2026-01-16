@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 import { IOSInput } from '../ios/IOSInput';
 import { IOSSelect } from '../ios/IOSSelect';
 import { IOSButton } from '../ios/IOSButton';
@@ -83,7 +83,16 @@ export function CreateCategoryModal({
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-ios-dark-tertiary">
-            <h2 className="text-xl font-semibold text-ios-text">Новая категория</h2>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onClose}
+                className="p-2 -ml-2 active:opacity-50 transition-opacity"
+                aria-label="Назад"
+              >
+                <ArrowLeft className="w-5 h-5 text-ios-text" />
+              </button>
+              <h2 className="text-xl font-semibold text-ios-text">Новая категория</h2>
+            </div>
             <button
               onClick={onClose}
               className="p-2 active:opacity-50 transition-opacity"
