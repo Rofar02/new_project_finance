@@ -1,0 +1,7 @@
+.idea/
+__pycache__/
+*.pyc
+project_finance_backend/.env
+data/
+letsencrypt/
+node_modules/
