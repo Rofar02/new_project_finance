@@ -26,10 +26,10 @@ from app.bot.bot import setup_bot, shutdown_bot, dp, bot
 async def lifespan(app: FastAPI):
     # --- БЛОК СОЗДАНИЯ ТАБЛИЦ ---
     try:
-        from app.db import engine  # У тебя файл app/db.py, а не папка
+        from app.db import async_engine  # У тебя файл app/db.py, а не папка
         from app.models.base import Base # Base у тебя в app/models/base.py
         
-        async with engine.begin() as conn:
+        async with async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("DATABASE: Tables created successfully!")
     except Exception as e:
@@ -42,18 +42,6 @@ async def lifespan(app: FastAPI):
     await bot.session.close()
     bot_task.cancel()
 
-    # Настраиваем бота (регистрируем handlers)
-    await setup_bot()
-    
-    # Запуск бота в фоне
-    bot_task = asyncio.create_task(dp.start_polling(bot, drop_pending_updates=True))
-    
-    yield
-    
-    # Остановка бота
-    await dp.stop_polling()
-    await bot.session.close()
-    bot_task.cancel()
     try:
         await bot_task
     except asyncio.CancelledError:
