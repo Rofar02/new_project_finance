@@ -15,10 +15,10 @@ class Settings(BaseSettings):
     
     # Telegram Bot
     telegram_bot_token: str
-    telegram_webapp_url: str = "https://gredzenfinance.ru/"  # URL вашего фронтенда
+    telegram_webapp_url: str = ""  # URL вашего фронтенда
 
     class Config:
-        env_file = str(Path(__file__).parent.parent / ".env")
+        env_file = "/app/.env"
         env_file_encoding = "utf-8"
 
 

@@ -47,7 +47,7 @@ services:
       ALGORITHM: ${ALGORITHM}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
       TELEGRAM_BOT_TOKEN: ${telegram_bot_token}
-      TELEGRAM_WEBAPP_URL: ${telegram_webapp_url}
+      TELEGRAM_WEBAPP_URL: https://gredzenfinance.ru
       APP_NAME: ${APP_NAME}
       DEBUG: ${DEBUG}
       HOST: ${HOST:-0.0.0.0}

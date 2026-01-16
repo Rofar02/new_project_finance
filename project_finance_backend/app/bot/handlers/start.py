@@ -11,7 +11,7 @@ router = Router()
 async def cmd_start(message: Message):
     """Обработчик команды /start"""
     webapp_url = settings.telegram_webapp_url
-    
+    print(f"\n🚀 DEBUG BOT SETTINGS: webapp_url is currently -> {webapp_url}\n")    
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
             text="🚀 Открыть приложение",
