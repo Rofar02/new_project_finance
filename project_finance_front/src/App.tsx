@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Transactions } from './pages/Transactions';
 import { AddTransaction } from './pages/AddTransaction';
 import { Charts } from './pages/Charts';
+import { Categories } from './pages/Categories';
 import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import './styles/index.css';
 
@@ -99,6 +100,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Charts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/categories"
+        element={
+          <ProtectedRoute>
+            <Categories />
           </ProtectedRoute>
         }
       />

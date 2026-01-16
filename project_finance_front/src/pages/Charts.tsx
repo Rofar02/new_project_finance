@@ -178,8 +178,12 @@ export function Charts() {
                     textAnchor="end"
                     height={100}
                     fontSize={12}
+                    tick={{ fill: '#EBEBF599' }}
                   />
-                  <YAxis stroke="#EBEBF599" />
+                  <YAxis 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1C1C1E',
@@ -188,6 +192,10 @@ export function Charts() {
                       color: '#EBEBF5',
                     }}
                     formatter={(value: number) => [`${value.toLocaleString('ru-RU')} ₽`, 'Сумма']}
+                  />
+                  <Legend 
+                    wrapperStyle={{ color: '#EBEBF5' }}
+                    contentStyle={{ color: '#EBEBF5' }}
                   />
                   <Bar dataKey="Сумма" fill="#EF4444" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -218,8 +226,12 @@ export function Charts() {
                     textAnchor="end"
                     height={100}
                     fontSize={12}
+                    tick={{ fill: '#EBEBF599' }}
                   />
-                  <YAxis stroke="#EBEBF599" />
+                  <YAxis 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1C1C1E',
@@ -251,8 +263,15 @@ export function Charts() {
               <ResponsiveContainer width="100%" height={300}>
                 <ComposedChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3A3A3C" />
-                  <XAxis dataKey="month" stroke="#EBEBF599" />
-                  <YAxis stroke="#EBEBF599" />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
+                  <YAxis 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1C1C1E',
@@ -262,7 +281,10 @@ export function Charts() {
                     }}
                     formatter={(value: number) => [`${value.toLocaleString('ru-RU')} ₽`, '']}
                   />
-                  <Legend />
+                  <Legend 
+                    wrapperStyle={{ color: '#EBEBF5' }}
+                    contentStyle={{ color: '#EBEBF5' }}
+                  />
                   <Bar dataKey="Доходы" fill="#10B981" radius={[8, 8, 0, 0]} />
                   <Bar dataKey="Расходы" fill="#EF4444" radius={[8, 8, 0, 0]} />
                   <Line
@@ -310,8 +332,15 @@ export function Charts() {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3A3A3C" />
-                  <XAxis dataKey="day" stroke="#EBEBF599" />
-                  <YAxis stroke="#EBEBF599" />
+                  <XAxis 
+                    dataKey="day" 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
+                  <YAxis 
+                    stroke="#EBEBF599" 
+                    tick={{ fill: '#EBEBF599' }}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1C1C1E',
@@ -321,7 +350,10 @@ export function Charts() {
                     }}
                     formatter={(value: number) => [`${value.toLocaleString('ru-RU')} ₽`, '']}
                   />
-                  <Legend />
+                  <Legend 
+                    wrapperStyle={{ color: '#EBEBF5' }}
+                    contentStyle={{ color: '#EBEBF5' }}
+                  />
                   <Area
                     type="monotone"
                     dataKey="Доходы"

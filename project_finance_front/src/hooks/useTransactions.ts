@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTransactions, createTransaction, deleteTransaction } from '../api/transactions';
+import { getTransactions, createTransaction, updateTransaction, deleteTransaction } from '../api/transactions';
 import type { Transaction, CreateTransactionData } from '../types';
 
 export function useTransactions() {
@@ -34,6 +34,18 @@ export function useTransactions() {
     }
   };
 
+  const updateTransactionData = async (id: number, data: Partial<CreateTransactionData>) => {
+    try {
+      const updatedTransaction = await updateTransaction(id, data);
+      setTransactions((prev) =>
+        prev.map((t) => (t.id === id ? updatedTransaction : t))
+      );
+      return updatedTransaction;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const removeTransaction = async (id: number) => {
     try {
       await deleteTransaction(id);
@@ -48,6 +60,7 @@ export function useTransactions() {
     isLoading,
     error,
     addTransaction,
+    updateTransaction: updateTransactionData,
     removeTransaction,
     refreshTransactions: fetchTransactions,
   };

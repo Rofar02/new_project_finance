@@ -18,6 +18,17 @@ export async function createTransaction(data: CreateTransactionData): Promise<Tr
 }
 
 /**
+ * Обновление транзакции
+ */
+export async function updateTransaction(
+  id: number,
+  data: Partial<CreateTransactionData>
+): Promise<Transaction> {
+  const response = await api.put<Transaction>(`/transactions/${id}`, data);
+  return response.data;
+}
+
+/**
  * Удаление транзакции
  */
 export async function deleteTransaction(id: number): Promise<void> {

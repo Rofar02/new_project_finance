@@ -2,41 +2,20 @@ import axios from 'axios';
 
 // Определяем API URL автоматически
 function getApiBaseUrl(): string {
-  // Используем переменную окружения, если задана
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    return envUrl;
-  }
-  
-  // Проверяем, открыто ли через туннель
+  // 1. Если проект запущен на сервере (через домен gredzenfinance.ru)
   const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  // Если это не localhost, значит открыто через туннель
   if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-    // Используем прокси через Vite (работает только в dev режиме)
-    // В production нужен отдельный туннель для backend
-    if (import.meta.env.DEV) {
-      // В dev режиме используем прокси
-      return '/api';
-    } else {
-      // В production нужна переменная VITE_API_URL
-      console.error('❌ VITE_API_URL не задан для production!');
-      console.error('❌ Создайте .env файл с VITE_API_URL=https://ваш-backend-tunnel.xtunnel.ru');
-      // Fallback - пытаемся угадать (скорее всего не сработает)
-      return `${protocol}//${hostname}:8000`;
-    }
+    return '/api'; // На сервере Nginx сам поймет, что это 8000 порт
   }
-  
-  // Локальная разработка - используем прокси
+
+  // 2. Если ты работаешь локально в PyCharm (localhost)
   if (import.meta.env.DEV) {
-    return '/api';
+    return 'http://localhost:8000'; // Прямой путь к твоему бэкенду
   }
-  
-  // Fallback
+
+  // 3. Запасной вариант
   return 'http://127.0.0.1:8000';
 }
-
 const API_BASE_URL = getApiBaseUrl();
 
 console.log('🔗 API Base URL:', API_BASE_URL);

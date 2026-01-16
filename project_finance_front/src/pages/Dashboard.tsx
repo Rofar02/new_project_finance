@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTransactions } from '../hooks/useTransactions';
-import { getCategories, deleteCategory } from '../api/categories';
+import { getCategories } from '../api/categories';
 import { calculateBalance, getCategoryStats, getIncomeCategoryStats } from '../api/transactions';
 import { getStatistics, type Statistics } from '../api/statistics';
 import { IOSHeader } from '../components/ios/IOSHeader';
 import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { ErrorMessage } from '../components/shared/ErrorMessage';
-import { CreateCategoryModal } from '../components/shared/CreateCategoryModal';
-import { Plus, TrendingUp, TrendingDown, LogOut, Tag, BarChart3, Trash2 } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, LogOut, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import type { Category } from '../types';
@@ -25,7 +24,6 @@ export function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [isStatisticsLoading, setIsStatisticsLoading] = useState(false);
-  const [isCreateCategoryModalOpen, setIsCreateCategoryModalOpen] = useState(false);
 
   // Calculate balance before useEffect that uses it
   const balance = calculateBalance(transactions || []);
@@ -81,46 +79,6 @@ export function Dashboard() {
     }
   };
 
-  const handleCategoryCreated = (newCategory: Category) => {
-    setCategories([...categories, newCategory]);
-    loadCategories(); // Обновляем список категорий
-  };
-
-  const handleDeleteCategory = async (id: number) => {
-    // Проверяем, есть ли транзакции с этой категорией
-    const transactionsWithCategory = (transactions || []).filter(
-      (t) => t.category_id === id
-    );
-
-    if (transactionsWithCategory.length > 0) {
-      const message = `Нельзя удалить категорию, так как она используется в ${transactionsWithCategory.length} транзакции(ях).\n\nСначала удалите или измените эти транзакции.`;
-      alert(message);
-      showNotification('error');
-      return;
-    }
-
-    if (!confirm('Вы уверены, что хотите удалить эту категорию?')) {
-      return;
-    }
-
-    hapticFeedback('light');
-    try {
-      await deleteCategory(id);
-      setCategories(categories.filter((cat) => cat.id !== id));
-      showNotification('success');
-    } catch (err: any) {
-      console.error('Failed to delete category:', err);
-      const errorMessage = err.response?.data?.detail || err.message || 'Ошибка при удалении категории';
-      
-      // Проверяем, если ошибка связана с транзакциями
-      if (errorMessage.includes('category_id') || errorMessage.includes('NOT NULL')) {
-        alert('Нельзя удалить категорию, так как она используется в транзакциях. Сначала удалите или измените эти транзакции.');
-      } else {
-        alert(errorMessage);
-      }
-      showNotification('error');
-    }
-  };
 
   const expenseCategoryStats = getCategoryStats(transactions || [], categories);
   const incomeCategoryStats = getIncomeCategoryStats(transactions || [], categories);
@@ -287,19 +245,37 @@ export function Dashboard() {
                     {statistics.transactions_count || 0}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg">
+                <div 
+                  onClick={() => {
+                    hapticFeedback('light');
+                    navigate('/transactions?type=income');
+                  }}
+                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                >
                   <p className="text-ios-text-tertiary text-xs mb-1">Доходов</p>
                   <p className="text-green-400 font-semibold text-lg">
                     {statistics.income_count || 0}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg">
+                <div 
+                  onClick={() => {
+                    hapticFeedback('light');
+                    navigate('/transactions?type=expense');
+                  }}
+                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                >
                   <p className="text-ios-text-tertiary text-xs mb-1">Расходов</p>
                   <p className="text-red-400 font-semibold text-lg">
                     {statistics.expense_count || 0}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg">
+                <div 
+                  onClick={() => {
+                    hapticFeedback('light');
+                    navigate('/categories');
+                  }}
+                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                >
                   <p className="text-ios-text-tertiary text-xs mb-1">Категорий</p>
                   <p className="text-primary-500 font-semibold text-lg">{categories.length}</p>
                 </div>
@@ -308,76 +284,6 @@ export function Dashboard() {
           </motion.div>
         )}
 
-        {/* Управление категориями */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <IOSCard>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-primary-500" />
-                <h3 className="text-lg font-semibold text-ios-text">Категории</h3>
-              </div>
-              <button
-                onClick={() => {
-                  hapticFeedback('light');
-                  setIsCreateCategoryModalOpen(true);
-                }}
-                className="px-3 py-1.5 bg-primary-500 text-white text-sm font-semibold rounded-ios-lg active:opacity-50 transition-opacity"
-              >
-                + Создать
-              </button>
-            </div>
-            {categories.length > 0 ? (
-              <div className="space-y-3">
-                <p className="text-ios-text-secondary text-sm">
-                  Всего категорий: <span className="text-ios-text font-semibold">{categories.length}</span>
-                </p>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {categories.map((cat) => (
-                    <div
-                      key={cat.id}
-                      className="flex items-center justify-between p-3 bg-ios-dark-tertiary rounded-ios-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-10 h-10 rounded-full" 
-                             style={cat.color ? { backgroundColor: `${cat.color}20` } : {}}>
-                          {cat.icon ? (
-                            <span className="text-xl" role="img" aria-label={cat.name}>
-                              {cat.icon}
-                            </span>
-                          ) : cat.color ? (
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: cat.color }}
-                            />
-                          ) : null}
-                        </div>
-                        <div>
-                          <p className="text-ios-text font-medium">{cat.name}</p>
-                          <p className="text-ios-text-tertiary text-xs">
-                            {cat.type === 'income' ? 'Доход' : 'Расход'}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteCategory(cat.id)}
-                        className="p-2 text-red-400 active:opacity-50 transition-opacity"
-                        title="Удалить категорию"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <p className="text-ios-text-tertiary text-sm">Нет категорий. Создайте первую!</p>
-            )}
-          </IOSCard>
-        </motion.div>
 
         {/* Графики - Доходы и Расходы */}
         {(incomePieData.length > 0 || expensePieData.length > 0) && (
@@ -425,6 +331,8 @@ export function Dashboard() {
                         color: '#EBEBF5',
                         padding: '8px 12px',
                       }}
+                      itemStyle={{ color: '#EBEBF5' }}
+                      labelStyle={{ color: '#EBEBF5' }}
                       formatter={(value: number, name: string, props: any) => [
                         `${value.toLocaleString('ru-RU')} ₽`,
                         props.payload.name || name,
@@ -444,6 +352,7 @@ export function Dashboard() {
                         paddingTop: '12px',
                       }}
                       iconType="circle"
+                      contentStyle={{ color: '#EBEBF5' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -494,6 +403,8 @@ export function Dashboard() {
                         color: '#EBEBF5',
                         padding: '8px 12px',
                       }}
+                      itemStyle={{ color: '#EBEBF5' }}
+                      labelStyle={{ color: '#EBEBF5' }}
                       formatter={(value: number, name: string, props: any) => [
                         `${value.toLocaleString('ru-RU')} ₽`,
                         props.payload.name || name,
@@ -513,6 +424,7 @@ export function Dashboard() {
                         paddingTop: '12px',
                       }}
                       iconType="circle"
+                      contentStyle={{ color: '#EBEBF5' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -568,13 +480,17 @@ export function Dashboard() {
                       color: '#EBEBF5',
                       padding: '8px 12px',
                     }}
+                    itemStyle={{ color: '#EBEBF5' }}
+                    labelStyle={{ color: '#EBEBF5' }}
                     formatter={(value: number) => `${value.toLocaleString('ru-RU')} ₽`}
                   />
                   <Legend 
                     wrapperStyle={{
                       paddingTop: '8px',
                       fontSize: '12px',
+                      color: '#EBEBF5',
                     }}
+                    contentStyle={{ color: '#EBEBF5' }}
                   />
                   <Line
                     type="monotone"
@@ -612,12 +528,6 @@ export function Dashboard() {
           <Plus className="w-6 h-6 text-white" />
         </motion.button>
 
-        {/* Модальное окно создания категории */}
-        <CreateCategoryModal
-          isOpen={isCreateCategoryModalOpen}
-          onClose={() => setIsCreateCategoryModalOpen(false)}
-          onCategoryCreated={handleCategoryCreated}
-        />
       </div>
     </div>
   );

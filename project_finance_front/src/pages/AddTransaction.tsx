@@ -8,7 +8,7 @@ import { IOSSelect } from '../components/ios/IOSSelect';
 import { IOSButton } from '../components/ios/IOSButton';
 import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 import type { Category } from '../types';
@@ -126,7 +126,22 @@ export function AddTransaction() {
   if (isLoadingCategories) {
     return (
       <div className="min-h-screen bg-ios-dark">
-        <IOSHeader title="Новая транзакция" showBack />
+        <IOSHeader 
+          title="Новая транзакция" 
+          showBack
+          rightAction={
+            <button
+              onClick={() => {
+                hapticFeedback('light');
+                navigate('/dashboard');
+              }}
+              className="p-2 active:opacity-50"
+              title="На главный экран"
+            >
+              <Home className="w-5 h-5 text-primary-500" />
+            </button>
+          }
+        />
         <LoadingSpinner />
       </div>
     );
@@ -134,7 +149,22 @@ export function AddTransaction() {
 
   return (
     <div className="min-h-screen bg-ios-dark pb-6">
-      <IOSHeader title="Новая транзакция" showBack />
+      <IOSHeader 
+        title="Новая транзакция" 
+        showBack
+        rightAction={
+          <button
+            onClick={() => {
+              hapticFeedback('light');
+              navigate('/dashboard');
+            }}
+            className="p-2 active:opacity-50"
+            title="На главный экран"
+          >
+            <Home className="w-5 h-5 text-primary-500" />
+          </button>
+        }
+      />
 
       <form onSubmit={handleSubmit} className="p-4 space-y-4">
         {/* Выбор типа */}
