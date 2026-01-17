@@ -9,6 +9,19 @@ logger = logging.getLogger(__name__)
 EXPENSE_KEYWORDS = ["расход", "расходы", "трата", "траты", "потратил", "потрачено", "потратить"]
 INCOME_KEYWORDS = ["доход", "доходы", "зарплата", "получил", "получено", "получить"]
 
+# Словарь русских числительных
+RUSSIAN_NUMBERS = {
+    "ноль": 0, "один": 1, "два": 2, "три": 3, "четыре": 4, "пять": 5,
+    "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10,
+    "одиннадцать": 11, "двенадцать": 12, "тринадцать": 13, "четырнадцать": 14,
+    "пятнадцать": 15, "шестнадцать": 16, "семнадцать": 17, "восемнадцать": 18,
+    "девятнадцать": 19, "двадцать": 20, "тридцать": 30, "сорок": 40,
+    "пятьдесят": 50, "шестьдесят": 60, "семьдесят": 70, "восемьдесят": 80,
+    "девяносто": 90, "сто": 100, "двести": 200, "триста": 300, "четыреста": 400,
+    "пятьсот": 500, "шестьсот": 600, "семьсот": 700, "восемьсот": 800,
+    "девятьсот": 900
+}
+
 
 def parse_transaction_text(text: str) -> Optional[Tuple[TransactionType, float, str]]:
     """
@@ -35,20 +48,42 @@ def parse_transaction_text(text: str) -> Optional[Tuple[TransactionType, float, 
         logger.warning(f"Could not determine transaction type from text: {text}")
         return None
     
-    # Извлекаем сумму (ищем число)
-    amount_pattern = r'(\d+(?:[.,]\d+)?)'
-    amount_matches = re.findall(amount_pattern, text)
+    # Извлекаем сумму (ищем число или слова)
+    amount = None
     
-    if not amount_matches:
+    # Сначала ищем паттерн: число + "тысяч"/"тысячи"/"тысяча" (приоритет)
+    thousands_pattern = r'(\d+)\s*(тысяч|тысячи|тысяча)'
+    thousands_match = re.search(thousands_pattern, text)
+    if thousands_match:
+        base_number = int(thousands_match.group(1))
+        amount = base_number * 1000
+    
+    # Если не нашли "число + тысяч", ищем числительные + "тысяч"
+    if amount is None:
+        thousands_words = ["тысяч", "тысячи", "тысяча"]
+        for num_word, num_value in RUSSIAN_NUMBERS.items():
+            for thousand_word in thousands_words:
+                pattern = rf'{num_word}\s+{thousand_word}'
+                if re.search(pattern, text):
+                    amount = num_value * 1000
+                    break
+            if amount:
+                break
+    
+    # Если не нашли "тысяч", ищем просто цифры
+    if amount is None:
+        amount_pattern = r'(\d+(?:[.,]\d+)?)'
+        amount_matches = re.findall(amount_pattern, text)
+        if amount_matches:
+            # Берем первое найденное число
+            amount_str = amount_matches[0].replace(',', '.')
+            try:
+                amount = float(amount_str)
+            except ValueError:
+                pass
+    
+    if amount is None:
         logger.warning(f"Could not find amount in text: {text}")
-        return None
-    
-    # Берем первое найденное число
-    amount_str = amount_matches[0].replace(',', '.')
-    try:
-        amount = float(amount_str)
-    except ValueError:
-        logger.warning(f"Could not parse amount: {amount_str}")
         return None
     
     # Извлекаем категорию (текст после "на" или "для")

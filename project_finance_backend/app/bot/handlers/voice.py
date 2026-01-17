@@ -179,7 +179,7 @@ async def show_confirmation_message(
     await message.edit_text(
         f"Правильно ли я понял?\n\n"
         f"{type_emoji} <b>Тип:</b> {type_text}\n"
-        f"💰 <b>Сумма:</b> {amount:,.0f}\n"
+        f"💰 <b>Сумма:</b> {int(amount)}\n"
         f"📁 <b>Категория:</b> {category_name}",
         reply_markup=keyboard
     )
@@ -250,9 +250,9 @@ async def handle_transaction_confirm(callback: CallbackQuery, state: FSMContext)
             type_emoji = "💸" if transaction.transaction_type == TransactionType.EXPENSE else "💰"
             await callback.message.edit_text(
                 f"{type_emoji} ✅ Транзакция успешно добавлена!\n\n"
-                f"💰 Сумма: {transaction.amount:,.0f}\n"
+                f"💰 Сумма: {int(transaction.amount)}\n"
                 f"📁 Категория: {transaction.category.name}\n"
-                f"💵 Баланс: {user.balance:,.0f}"
+                f"💵 Баланс: {int(user.balance)}"
             )
             await callback.answer("Транзакция добавлена!")
         
