@@ -278,8 +278,8 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-ios-lg cursor-pointer border border-primary-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
+                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
+                    <div className="flex justify-center items-center mb-3 h-10">
                       <div className="p-2.5 bg-primary-500/20 rounded-xl">
                         <Receipt className="w-5 h-5 text-primary-400" />
                       </div>
@@ -298,8 +298,8 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
+                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
+                    <div className="flex justify-center items-center mb-3 h-10">
                       <div className="p-2.5 bg-green-500/20 rounded-xl">
                         <ArrowUpCircle className="w-5 h-5 text-green-400" />
                       </div>
@@ -318,8 +318,8 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
+                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
+                    <div className="flex justify-center items-center mb-3 h-10">
                       <div className="p-2.5 bg-red-500/20 rounded-xl">
                         <ArrowDownCircle className="w-5 h-5 text-red-400" />
                       </div>
@@ -338,8 +338,8 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
+                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
+                    <div className="flex justify-center items-center mb-3 h-10">
                       <div className="p-2.5 bg-blue-500/20 rounded-xl">
                         <Folder className="w-5 h-5 text-blue-400" />
                       </div>
