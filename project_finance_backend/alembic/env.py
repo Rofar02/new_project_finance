@@ -1,4 +1,17 @@
 from logging.config import fileConfig
+from pathlib import Path
+
+# Загружаем .env файл ПЕРЕД импортом модулей, которые используют settings
+from dotenv import load_dotenv
+
+# Определяем путь к .env файлу (относительно корня проекта project_finance_backend)
+env_path = Path(__file__).parent.parent / ".env"
+# Пробуем загрузить локальный .env, если не найден - пробуем Docker путь
+if env_path.exists():
+    load_dotenv(env_path, override=True)
+else:
+    # Пробуем Docker путь (для работы внутри контейнера)
+    load_dotenv("/app/.env", override=True)
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
