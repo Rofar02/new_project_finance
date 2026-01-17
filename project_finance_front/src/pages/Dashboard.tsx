@@ -276,7 +276,7 @@ export function Dashboard() {
                     navigate('/transactions');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-ios-lg cursor-pointer border border-primary-500/20 active:opacity-80 transition-all"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-ios-lg cursor-pointer border border-primary-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -296,7 +296,7 @@ export function Dashboard() {
                     navigate('/transactions?type=income');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -316,7 +316,7 @@ export function Dashboard() {
                     navigate('/transactions?type=expense');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -336,7 +336,7 @@ export function Dashboard() {
                     navigate('/categories');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
