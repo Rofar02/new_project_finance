@@ -19,6 +19,7 @@ from app.routers.profile import router as profile_router
 from app.routers.stats import router as stats_router
 from app.routers.telegram import router as telegram_router
 from app.bot.bot import setup_bot, shutdown_bot, dp, bot
+from app.bot.scheduler import start_scheduler, shutdown_scheduler
 
 
 
@@ -37,7 +38,14 @@ async def lifespan(app: FastAPI):
     # ----------------------------
     await setup_bot()
     bot_task = asyncio.create_task(dp.start_polling(bot, drop_pending_updates=True))
+    
+    # Запускаем планировщик для уведомлений
+    start_scheduler()
+    
     yield
+    # Останавливаем планировщик
+    shutdown_scheduler()
+    
     await dp.stop_polling()
     await bot.session.close()
     bot_task.cancel()

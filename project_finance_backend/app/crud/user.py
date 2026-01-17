@@ -98,3 +98,10 @@ async def get_user_by_telegram_id(db: AsyncSession, telegram_id: int):
     query = select(Users).where(Users.username == username)
     result = await db.execute(query)
     return result.scalar_one_or_none()
+
+
+async def get_all_telegram_users(db: AsyncSession):
+    """Получить всех пользователей с Telegram аккаунтами"""
+    query = select(Users).where(Users.username.like("tg_%"))
+    result = await db.execute(query)
+    return result.scalars().all()
