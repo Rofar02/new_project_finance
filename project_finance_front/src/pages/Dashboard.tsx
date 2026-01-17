@@ -296,7 +296,7 @@ export function Dashboard() {
                     navigate('/transactions?type=income');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -304,7 +304,7 @@ export function Dashboard() {
                         <ArrowUpCircle className="w-5 h-5 text-green-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Доходов</p>
+                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Доходы</p>
                     <p className="text-green-400 font-bold text-2xl">
                       {statistics.income_count || 0}
                     </p>
@@ -316,7 +316,7 @@ export function Dashboard() {
                     navigate('/transactions?type=expense');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -324,7 +324,7 @@ export function Dashboard() {
                         <ArrowDownCircle className="w-5 h-5 text-red-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Расходов</p>
+                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Расходы</p>
                     <p className="text-red-400 font-bold text-2xl">
                       {statistics.expense_count || 0}
                     </p>
@@ -336,7 +336,7 @@ export function Dashboard() {
                     navigate('/categories');
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all"
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all min-h-[140px] flex flex-col justify-center"
                 >
                   <div className="text-center">
                     <div className="flex justify-center mb-3">
@@ -344,7 +344,7 @@ export function Dashboard() {
                         <Folder className="w-5 h-5 text-blue-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Категорий</p>
+                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Категории</p>
                     <p className="text-blue-400 font-bold text-2xl">{categories.length}</p>
                   </div>
                 </motion.div>
@@ -573,6 +573,8 @@ export function Dashboard() {
                     navigate('/charts');
                   }}
                   className="flex items-center gap-2 px-3 py-1.5 bg-primary-500 text-white text-sm font-semibold rounded-ios-lg active:opacity-50 transition-opacity"
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                  onTouchStart={(e) => e.stopPropagation()}
                 >
                   <BarChart3 className="w-4 h-4" />
                   Все графики
