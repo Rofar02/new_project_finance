@@ -16,7 +16,17 @@ import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis
 import type { Category } from '../types';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 
-const COLORS = ['#8E44FD', '#9C4DFF', '#B880FF', '#D4B3FF', '#E8D5FF', '#F5EDFF'];
+// Улучшенная цветовая палитра с градиентами для графиков
+const COLORS = [
+  '#8E44FD', // Фиолетовый
+  '#10B981', // Зеленый
+  '#3B82F6', // Синий
+  '#F59E0B', // Оранжевый
+  '#EC4899', // Розовый
+  '#06B6D4', // Циан
+  '#A855F7', // Пурпурный
+  '#F97316', // Оранжевый 2
+];
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -370,6 +380,9 @@ export function Dashboard() {
                       innerRadius={40}
                       fill="#8884d8"
                       dataKey="value"
+                      animationBegin={0}
+                      animationDuration={800}
+                      animationEasing="ease-out"
                     >
                       {incomePieData.map((entry, index) => {
                         // Используем цвет категории, если он есть
@@ -442,6 +455,9 @@ export function Dashboard() {
                       innerRadius={40}
                       fill="#8884d8"
                       dataKey="value"
+                      animationBegin={0}
+                      animationDuration={800}
+                      animationEasing="ease-out"
                     >
                       {expensePieData.map((entry, index) => {
                         // Используем цвет категории, если он есть

@@ -5,7 +5,8 @@ import { IOSHeader } from '../components/ios/IOSHeader';
 import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { CreateCategoryModal } from '../components/shared/CreateCategoryModal';
-import { Plus, Trash2, Tag } from 'lucide-react';
+import { EmptyState } from '../components/shared/EmptyState';
+import { Plus, Trash2, Tag, FolderOpen, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 import { useTransactions } from '../hooks/useTransactions';
@@ -174,7 +175,13 @@ export function Categories() {
                 ))}
               </div>
             ) : (
-              <p className="text-ios-text-tertiary text-sm">Нет категорий доходов</p>
+              <EmptyState
+                icon={ArrowUpCircle}
+                title="Нет категорий доходов"
+                description="Создайте категорию для доходов, чтобы начать отслеживать свои финансы"
+                actionLabel="Создать категорию"
+                onAction={() => setIsCreateCategoryModalOpen(true)}
+              />
             )}
           </IOSCard>
         </motion.div>
@@ -195,48 +202,74 @@ export function Categories() {
             {expenseCategories.length > 0 ? (
               <div className="space-y-2">
                 {expenseCategories.map((cat) => (
-                  <div
+                  <motion.div
                     key={cat.id}
                     onClick={() => handleCategoryClick(cat)}
-                    className={`flex items-center justify-between p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity ${
-                      selectedCategory?.id === cat.id ? 'ring-2 ring-primary-500' : ''
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex items-center justify-between p-4 bg-gradient-to-r from-ios-dark-tertiary to-ios-dark-tertiary/50 rounded-ios-lg cursor-pointer border transition-all ${
+                      selectedCategory?.id === cat.id 
+                        ? 'ring-2 ring-primary-500 border-primary-500/50 bg-gradient-to-r from-primary-500/10 to-purple-500/10' 
+                        : 'border-ios-dark-quaternary/50 hover:border-ios-dark-quaternary'
                     }`}
+                    style={cat.color && selectedCategory?.id !== cat.id ? {
+                      borderColor: `${cat.color}30`,
+                      background: `linear-gradient(to right, ${cat.color}10, ${cat.color}05)`,
+                    } : {}}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full" 
-                           style={cat.color ? { backgroundColor: `${cat.color}20` } : {}}>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div 
+                        className="flex items-center justify-center w-12 h-12 rounded-xl flex-shrink-0"
+                        style={cat.color ? { 
+                          background: `linear-gradient(135deg, ${cat.color}30, ${cat.color}15)`,
+                          border: `1px solid ${cat.color}40`,
+                        } : {
+                          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15))',
+                          border: '1px solid rgba(239, 68, 68, 0.4)',
+                        }}
+                      >
                         {cat.icon ? (
-                          <span className="text-xl" role="img" aria-label={cat.name}>
+                          <span className="text-2xl" role="img" aria-label={cat.name}>
                             {cat.icon}
                           </span>
                         ) : cat.color ? (
                           <div
-                            className="w-4 h-4 rounded-full"
+                            className="w-5 h-5 rounded-full"
                             style={{ backgroundColor: cat.color }}
                           />
-                        ) : null}
+                        ) : (
+                          <Tag className="w-5 h-5 text-red-400" />
+                        )}
                       </div>
-                      <div>
-                        <p className="text-ios-text font-medium">{cat.name}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-ios-text font-semibold text-base">{cat.name}</p>
+                        <p className="text-ios-text-tertiary text-xs mt-0.5">Расход</p>
                       </div>
                     </div>
                     {selectedCategory?.id === cat.id && (
-                      <button
+                      <motion.button
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteCategory(cat.id);
                         }}
-                        className="p-2 text-red-400 active:opacity-50 transition-opacity"
+                        className="ml-3 p-2.5 bg-red-500/20 rounded-lg text-red-400 active:opacity-50 transition-opacity border border-red-500/30"
                         title="Удалить категорию"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <Trash2 className="w-5 h-5" />
+                      </motion.button>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             ) : (
-              <p className="text-ios-text-tertiary text-sm">Нет категорий расходов</p>
+              <EmptyState
+                icon={ArrowDownCircle}
+                title="Нет категорий расходов"
+                description="Создайте категорию для расходов, чтобы начать отслеживать свои финансы"
+                actionLabel="Создать категорию"
+                onAction={() => setIsCreateCategoryModalOpen(true)}
+              />
             )}
           </IOSCard>
         </motion.div>

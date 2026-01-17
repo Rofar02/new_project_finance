@@ -7,7 +7,8 @@ import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { ErrorMessage } from '../components/shared/ErrorMessage';
 import { EditTransactionModal } from '../components/shared/EditTransactionModal';
-import { Plus, Trash2, ArrowUpRight, ArrowDownRight, Home, Edit } from 'lucide-react';
+import { EmptyState } from '../components/shared/EmptyState';
+import { Plus, Trash2, ArrowUpRight, ArrowDownRight, Home, Edit, Receipt } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 import type { Transaction } from '../types';
@@ -130,26 +131,32 @@ export function Transactions() {
       <div className="p-4 space-y-6">
         {grouped.length === 0 ? (
           <IOSCard>
-            <div className="text-center py-8">
-              <p className="text-ios-text-tertiary">Нет транзакций</p>
-              <button
-                onClick={() => navigate('/add-transaction')}
-                className="text-primary-500 mt-4 font-semibold"
-              >
-                Добавить первую транзакцию
-              </button>
-            </div>
+            <EmptyState
+              icon={Receipt}
+              title="Нет транзакций"
+              description={
+                filterType === 'income'
+                  ? "У вас пока нет доходов. Начните добавлять транзакции, чтобы отслеживать свои финансы."
+                  : filterType === 'expense'
+                  ? "У вас пока нет расходов. Добавьте первую транзакцию, чтобы начать вести учет."
+                  : "У вас пока нет транзакций. Добавьте первую транзакцию, чтобы начать вести учет своих финансов."
+              }
+              actionLabel="Добавить транзакцию"
+              onAction={() => navigate('/add-transaction')}
+            />
           </IOSCard>
         ) : (
           grouped.map((group) => (
             <div key={group.date} className="space-y-2">
-              <div className="flex items-center justify-between px-2 mb-2">
-                <h3 className="text-sm font-semibold text-ios-text-secondary">
+              <div className="flex items-center justify-between px-3 mb-3 py-2 bg-ios-dark-tertiary/50 rounded-ios-lg">
+                <h3 className="text-sm font-semibold text-ios-text">
                   {group.date}
                 </h3>
                 <span
-                  className={`text-sm font-medium ${
-                    group.total >= 0 ? 'text-green-400' : 'text-red-400'
+                  className={`text-sm font-bold ${
+                    group.total >= 0 
+                      ? 'bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent' 
+                      : 'bg-gradient-to-r from-red-400 to-orange-300 bg-clip-text text-transparent'
                   }`}
                 >
                   {group.total >= 0 ? '+' : ''}
@@ -180,10 +187,14 @@ export function Transactions() {
           hapticFeedback('light');
           navigate('/add-transaction');
         }}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-primary-500 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-all hover:shadow-2xl"
         whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 20 }}
       >
-        <Plus className="w-6 h-6 text-white" />
+        <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
       </motion.button>
 
       {/* Модальное окно редактирования */}
@@ -296,44 +307,52 @@ function TransactionItem({
           }}
         >
           <div className="flex items-center gap-4">
-            <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                isIncome ? 'bg-green-500/20' : 'bg-red-500/20'
-              }`}
-              style={transaction.category?.color ? {
-                backgroundColor: `${transaction.category.color}20`,
-              } : {}}
-            >
-              {transaction.category?.icon ? (
-                <span className="text-2xl" role="img" aria-label={transaction.category.name}>
-                  {transaction.category.icon}
-                </span>
-              ) : isIncome ? (
-                <ArrowDownRight className="w-6 h-6 text-green-400" />
-              ) : (
-                <ArrowUpRight className="w-6 h-6 text-red-400" />
-              )}
+            {/* Иконка категории с градиентом */}
+            <div className="relative">
+              <div
+                className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                  isIncome 
+                    ? 'bg-gradient-to-br from-green-500/30 to-emerald-500/20 border border-green-500/30' 
+                    : 'bg-gradient-to-br from-red-500/30 to-orange-500/20 border border-red-500/30'
+                }`}
+                style={transaction.category?.color ? {
+                  background: `linear-gradient(135deg, ${transaction.category.color}30, ${transaction.category.color}15)`,
+                  borderColor: `${transaction.category.color}40`,
+                } : {}}
+              >
+                {transaction.category?.icon ? (
+                  <span className="text-2xl" role="img" aria-label={transaction.category.name}>
+                    {transaction.category.icon}
+                  </span>
+                ) : isIncome ? (
+                  <ArrowDownRight className="w-7 h-7 text-green-400" />
+                ) : (
+                  <ArrowUpRight className="w-7 h-7 text-red-400" />
+                )}
+              </div>
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-ios-text font-medium truncate">
+              <p className="text-ios-text font-semibold truncate text-base">
                 {transaction.description || transaction.category?.name || 'Без описания'}
               </p>
-              <p className="text-ios-text-tertiary text-sm">
+              <p className="text-ios-text-tertiary text-sm mt-0.5">
                 {transaction.category?.name || 'Без категории'}
               </p>
             </div>
 
             <div className="text-right">
               <p
-                className={`font-semibold ${
-                  isIncome ? 'text-green-400' : 'text-red-400'
+                className={`font-bold text-lg ${
+                  isIncome 
+                    ? 'bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent' 
+                    : 'bg-gradient-to-r from-red-400 to-orange-300 bg-clip-text text-transparent'
                 }`}
               >
                 {isIncome ? '+' : '-'}
                 {transaction.amount.toLocaleString('ru-RU')} ₽
               </p>
-              <p className="text-ios-text-tertiary text-xs">
+              <p className="text-ios-text-tertiary text-xs mt-1">
                 {new Date(transaction.created_at).toLocaleTimeString('ru-RU', {
                   hour: '2-digit',
                   minute: '2-digit',

@@ -5,10 +5,9 @@ import { getCategories } from '../api/categories';
 import { IOSHeader } from '../components/ios/IOSHeader';
 import { IOSInput } from '../components/ios/IOSInput';
 import { IOSSelect } from '../components/ios/IOSSelect';
-import { IOSButton } from '../components/ios/IOSButton';
 import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
-import { ArrowDownRight, ArrowUpRight, Home } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Home, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 import type { Category } from '../types';
@@ -168,40 +167,60 @@ export function AddTransaction() {
 
       <form onSubmit={handleSubmit} className="p-4 space-y-4">
         {/* Выбор типа */}
-        <IOSCard>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                hapticFeedback('light');
-                setTransactionType('expense');
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-ios-lg font-semibold transition-all ${
-                transactionType === 'expense'
-                  ? 'bg-red-500/20 text-red-400 border-2 border-red-500/50'
-                  : 'bg-ios-dark-tertiary text-ios-text-tertiary'
-              }`}
-            >
-              <ArrowUpRight className="w-5 h-5" />
-              Расход
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                hapticFeedback('light');
-                setTransactionType('income');
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-ios-lg font-semibold transition-all ${
-                transactionType === 'income'
-                  ? 'bg-green-500/20 text-green-400 border-2 border-green-500/50'
-                  : 'bg-ios-dark-tertiary text-ios-text-tertiary'
-              }`}
-            >
-              <ArrowDownRight className="w-5 h-5" />
-              Доход
-            </button>
-          </div>
-        </IOSCard>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <IOSCard className="p-2">
+            <div className="relative flex gap-2 p-1 bg-ios-dark-tertiary rounded-ios-lg">
+              {/* Анимированный фон для активной кнопки */}
+              <motion.div
+                className={`absolute top-1 bottom-1 rounded-ios-lg ${
+                  transactionType === 'expense'
+                    ? 'left-1 right-1/2 bg-gradient-to-r from-red-500/30 to-orange-500/20 border border-red-500/30'
+                    : 'left-1/2 right-1 bg-gradient-to-r from-green-500/30 to-emerald-500/20 border border-green-500/30'
+                }`}
+                layout
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
+              
+              <motion.button
+                type="button"
+                onClick={() => {
+                  hapticFeedback('light');
+                  setTransactionType('expense');
+                }}
+                whileTap={{ scale: 0.95 }}
+                className={`relative flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-ios-lg font-semibold transition-all z-10 ${
+                  transactionType === 'expense'
+                    ? 'text-red-400'
+                    : 'text-ios-text-tertiary'
+                }`}
+              >
+                <ArrowDownCircle className={`w-5 h-5 ${transactionType === 'expense' ? 'text-red-400' : 'text-ios-text-tertiary'}`} />
+                Расход
+              </motion.button>
+              
+              <motion.button
+                type="button"
+                onClick={() => {
+                  hapticFeedback('light');
+                  setTransactionType('income');
+                }}
+                whileTap={{ scale: 0.95 }}
+                className={`relative flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-ios-lg font-semibold transition-all z-10 ${
+                  transactionType === 'income'
+                    ? 'text-green-400'
+                    : 'text-ios-text-tertiary'
+                }`}
+              >
+                <ArrowUpCircle className={`w-5 h-5 ${transactionType === 'income' ? 'text-green-400' : 'text-ios-text-tertiary'}`} />
+                Доход
+              </motion.button>
+            </div>
+          </IOSCard>
+        </motion.div>
 
         {/* Сумма */}
         <IOSCard>
@@ -267,13 +286,18 @@ export function AddTransaction() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <IOSButton
+          <motion.button
             type="submit"
-            fullWidth
             disabled={isSubmitting}
+            whileTap={{ scale: 0.98 }}
+            className={`w-full py-4 px-6 rounded-ios-lg font-semibold text-white transition-all ${
+              transactionType === 'income'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'
+                : 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600'
+            } disabled:opacity-50 disabled:cursor-not-allowed shadow-lg active:shadow-md`}
           >
             {isSubmitting ? 'Сохранение...' : 'Сохранить'}
-          </IOSButton>
+          </motion.button>
         </motion.div>
       </form>
     </div>
