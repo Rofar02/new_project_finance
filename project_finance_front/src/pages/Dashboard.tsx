@@ -12,7 +12,7 @@ import { SkeletonBalanceCard, SkeletonCard } from '../components/shared/Skeleton
 import { ErrorMessage } from '../components/shared/ErrorMessage';
 import { Plus, TrendingUp, TrendingDown, LogOut, BarChart3, Receipt, ArrowUpCircle, ArrowDownCircle, Folder } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area } from 'recharts';
 import type { Category } from '../types';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 
@@ -370,45 +370,68 @@ export function Dashboard() {
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
+                    <defs>
+                      {incomePieData.map((entry, index) => {
+                        const categoryColor = entry.category?.color || COLORS[index % COLORS.length];
+                        const gradientId = `income-gradient-${index}`;
+                        return (
+                          <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor={categoryColor} stopOpacity={1} />
+                            <stop offset="100%" stopColor={categoryColor} stopOpacity={0.7} />
+                          </linearGradient>
+                        );
+                      })}
+                    </defs>
                     <Pie
                       data={incomePieData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       label={false}
-                      outerRadius={100}
-                      innerRadius={40}
+                      outerRadius={110}
+                      innerRadius={50}
                       fill="#8884d8"
                       dataKey="value"
                       animationBegin={0}
-                      animationDuration={800}
+                      animationDuration={1000}
                       animationEasing="ease-out"
+                      paddingAngle={2}
                     >
                       {incomePieData.map((entry, index) => {
-                        // Используем цвет категории, если он есть
-                        const categoryColor = entry.category?.color;
+                        const categoryColor = entry.category?.color || COLORS[index % COLORS.length];
+                        const gradientId = `income-gradient-${index}`;
                         return (
                           <Cell 
                             key={`income-cell-${index}`} 
-                            fill={categoryColor || COLORS[index % COLORS.length]} 
+                            fill={`url(#${gradientId})`}
+                            stroke={categoryColor}
+                            strokeWidth={2}
                           />
                         );
                       })}
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1C1C1E',
-                        border: '1px solid #3A3A3C',
-                        borderRadius: '14px',
+                        backgroundColor: 'rgba(28, 28, 30, 0.95)',
+                        border: '1px solid rgba(58, 58, 60, 0.8)',
+                        borderRadius: '16px',
                         color: '#EBEBF5',
-                        padding: '8px 12px',
+                        padding: '12px 16px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                        backdropFilter: 'blur(10px)',
                       }}
-                      itemStyle={{ color: '#EBEBF5' }}
-                      labelStyle={{ color: '#EBEBF5' }}
-                      formatter={(value: number, name: string, props: any) => [
-                        `${value.toLocaleString('ru-RU')} ₽`,
-                        props.payload.name || name,
-                      ]}
+                      itemStyle={{ color: '#EBEBF5', padding: '4px 0' }}
+                      labelStyle={{ color: '#EBEBF5', fontWeight: '600', marginBottom: '8px' }}
+                      formatter={(value: number, name: string, props: any) => {
+                        const total = incomePieData.reduce((sum, item) => sum + item.value, 0);
+                        const percent = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                        return [
+                          <span key="value" style={{ fontWeight: 'bold' }}>
+                            {value.toLocaleString('ru-RU')} ₽ <span style={{ opacity: 0.7 }}>({percent}%)</span>
+                          </span>,
+                          props.payload.name || name,
+                        ];
+                      }}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -445,45 +468,68 @@ export function Dashboard() {
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
+                    <defs>
+                      {expensePieData.map((entry, index) => {
+                        const categoryColor = entry.category?.color || COLORS[index % COLORS.length];
+                        const gradientId = `expense-gradient-${index}`;
+                        return (
+                          <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stopColor={categoryColor} stopOpacity={1} />
+                            <stop offset="100%" stopColor={categoryColor} stopOpacity={0.7} />
+                          </linearGradient>
+                        );
+                      })}
+                    </defs>
                     <Pie
                       data={expensePieData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       label={false}
-                      outerRadius={100}
-                      innerRadius={40}
+                      outerRadius={110}
+                      innerRadius={50}
                       fill="#8884d8"
                       dataKey="value"
                       animationBegin={0}
-                      animationDuration={800}
+                      animationDuration={1000}
                       animationEasing="ease-out"
+                      paddingAngle={2}
                     >
                       {expensePieData.map((entry, index) => {
-                        // Используем цвет категории, если он есть
-                        const categoryColor = entry.category?.color;
+                        const categoryColor = entry.category?.color || COLORS[index % COLORS.length];
+                        const gradientId = `expense-gradient-${index}`;
                         return (
                           <Cell 
                             key={`expense-cell-${index}`} 
-                            fill={categoryColor || COLORS[index % COLORS.length]} 
+                            fill={`url(#${gradientId})`}
+                            stroke={categoryColor}
+                            strokeWidth={2}
                           />
                         );
                       })}
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1C1C1E',
-                        border: '1px solid #3A3A3C',
-                        borderRadius: '14px',
+                        backgroundColor: 'rgba(28, 28, 30, 0.95)',
+                        border: '1px solid rgba(58, 58, 60, 0.8)',
+                        borderRadius: '16px',
                         color: '#EBEBF5',
-                        padding: '8px 12px',
+                        padding: '12px 16px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                        backdropFilter: 'blur(10px)',
                       }}
-                      itemStyle={{ color: '#EBEBF5' }}
-                      labelStyle={{ color: '#EBEBF5' }}
-                      formatter={(value: number, name: string, props: any) => [
-                        `${value.toLocaleString('ru-RU')} ₽`,
-                        props.payload.name || name,
-                      ]}
+                      itemStyle={{ color: '#EBEBF5', padding: '4px 0' }}
+                      labelStyle={{ color: '#EBEBF5', fontWeight: '600', marginBottom: '8px' }}
+                      formatter={(value: number, name: string, props: any) => {
+                        const total = expensePieData.reduce((sum, item) => sum + item.value, 0);
+                        const percent = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                        return [
+                          <span key="value" style={{ fontWeight: 'bold' }}>
+                            {value.toLocaleString('ru-RU')} ₽ <span style={{ opacity: 0.7 }}>({percent}%)</span>
+                          </span>,
+                          props.payload.name || name,
+                        ];
+                      }}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -532,60 +578,84 @@ export function Dashboard() {
                   Все графики
                 </button>
               </div>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={lineData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3A3A3C" opacity={0.3} />
+              <ResponsiveContainer width="100%" height={280}>
+                <AreaChart data={lineData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#3A3A3C" opacity={0.2} />
                   <XAxis 
                     dataKey="date" 
                     stroke="#EBEBF599" 
                     fontSize={11}
                     tick={{ fill: '#EBEBF599' }}
+                    tickLine={{ stroke: '#EBEBF599', opacity: 0.3 }}
                   />
                   <YAxis 
                     stroke="#EBEBF599" 
                     fontSize={11}
                     tick={{ fill: '#EBEBF599' }}
                     width={50}
+                    tickLine={{ stroke: '#EBEBF599', opacity: 0.3 }}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1C1C1E',
-                      border: '1px solid #3A3A3C',
-                      borderRadius: '14px',
+                      backgroundColor: 'rgba(28, 28, 30, 0.95)',
+                      border: '1px solid rgba(58, 58, 60, 0.8)',
+                      borderRadius: '16px',
                       color: '#EBEBF5',
-                      padding: '8px 12px',
+                      padding: '12px 16px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                      backdropFilter: 'blur(10px)',
                     }}
-                    itemStyle={{ color: '#EBEBF5' }}
-                    labelStyle={{ color: '#EBEBF5' }}
-                    formatter={(value: number) => `${value.toLocaleString('ru-RU')} ₽`}
+                    itemStyle={{ color: '#EBEBF5', padding: '4px 0' }}
+                    labelStyle={{ color: '#EBEBF5', fontWeight: '600', marginBottom: '8px' }}
+                    formatter={(value: number, name: string) => [
+                      <span key="value" style={{ fontWeight: 'bold' }}>
+                        {value.toLocaleString('ru-RU')} ₽
+                      </span>,
+                      name === 'income' ? 'Доходы' : 'Расходы',
+                    ]}
                   />
                   <Legend 
                     wrapperStyle={{
-                      paddingTop: '8px',
+                      paddingTop: '12px',
                       fontSize: '12px',
                       color: '#EBEBF5',
                     }}
                     contentStyle={{ color: '#EBEBF5' }}
+                    iconType="line"
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="income"
                     stroke="#10B981"
                     strokeWidth={3}
+                    fill="url(#incomeGradient)"
                     name="Доходы"
-                    dot={{ fill: '#10B981', r: 4 }}
-                    activeDot={{ r: 6 }}
+                    dot={{ fill: '#10B981', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+                    animationDuration={800}
                   />
-                  <Line
+                  <Area
                     type="monotone"
                     dataKey="expense"
                     stroke="#EF4444"
                     strokeWidth={3}
+                    fill="url(#expenseGradient)"
                     name="Расходы"
-                    dot={{ fill: '#EF4444', r: 4 }}
-                    activeDot={{ r: 6 }}
+                    dot={{ fill: '#EF4444', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+                    animationDuration={800}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </IOSCard>
           </motion.div>
