@@ -18,11 +18,12 @@ dp = Dispatcher(storage=storage)
 
 async def setup_bot():
     """Настройка бота и регистрация всех handlers"""
-    from app.bot.handlers import start_router, webapp_router
+    from app.bot.handlers import start_router, webapp_router, voice_router
     
     # Регистрируем роутеры
     dp.include_router(start_router)
     dp.include_router(webapp_router)
+    dp.include_router(voice_router)
 
 
 async def shutdown_bot():

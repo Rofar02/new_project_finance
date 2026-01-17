@@ -90,3 +90,11 @@ async def delete_user(db: AsyncSession, user_id: int):
     await db.delete(db_user)
     await db.commit()
     return db_user
+
+
+async def get_user_by_telegram_id(db: AsyncSession, telegram_id: int):
+    """Получить пользователя по Telegram ID"""
+    username = f"tg_{telegram_id}"
+    query = select(Users).where(Users.username == username)
+    result = await db.execute(query)
+    return result.scalar_one_or_none()
