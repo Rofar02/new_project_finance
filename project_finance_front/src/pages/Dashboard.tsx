@@ -278,16 +278,18 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-ios-lg cursor-pointer border border-primary-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
-                    <div className="flex justify-center items-center mb-3 h-10">
+                  <div className="text-center w-full h-full flex flex-col">
+                    <div className="flex justify-center items-center pt-2 pb-3 h-10 flex-shrink-0">
                       <div className="p-2.5 bg-primary-500/20 rounded-xl">
                         <Receipt className="w-5 h-5 text-primary-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Всего транзакций</p>
-                    <p className="text-ios-text font-bold text-2xl">
-                      {statistics.transactions_count || 0}
-                    </p>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Всего транзакций</p>
+                      <p className="text-ios-text font-bold text-2xl">
+                        {statistics.transactions_count || 0}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
                 <motion.div 
@@ -298,16 +300,18 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
-                    <div className="flex justify-center items-center mb-3 h-10">
+                  <div className="text-center w-full h-full flex flex-col">
+                    <div className="flex justify-center items-center pt-2 pb-3 h-10 flex-shrink-0">
                       <div className="p-2.5 bg-green-500/20 rounded-xl">
                         <ArrowUpCircle className="w-5 h-5 text-green-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Доходы</p>
-                    <p className="text-green-400 font-bold text-2xl">
-                      {statistics.income_count || 0}
-                    </p>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Доходы</p>
+                      <p className="text-green-400 font-bold text-2xl">
+                        {statistics.income_count || 0}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
                 <motion.div 
@@ -318,16 +322,18 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
-                    <div className="flex justify-center items-center mb-3 h-10">
+                  <div className="text-center w-full h-full flex flex-col">
+                    <div className="flex justify-center items-center pt-2 pb-3 h-10 flex-shrink-0">
                       <div className="p-2.5 bg-red-500/20 rounded-xl">
                         <ArrowDownCircle className="w-5 h-5 text-red-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Расходы</p>
-                    <p className="text-red-400 font-bold text-2xl">
-                      {statistics.expense_count || 0}
-                    </p>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Расходы</p>
+                      <p className="text-red-400 font-bold text-2xl">
+                        {statistics.expense_count || 0}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
                 <motion.div 
@@ -338,14 +344,16 @@ export function Dashboard() {
                   whileTap={{ scale: 0.95 }}
                   className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all h-[150px] flex flex-col justify-center"
                 >
-                  <div className="text-center w-full flex flex-col items-center justify-center h-full">
-                    <div className="flex justify-center items-center mb-3 h-10">
+                  <div className="text-center w-full h-full flex flex-col">
+                    <div className="flex justify-center items-center pt-2 pb-3 h-10 flex-shrink-0">
                       <div className="p-2.5 bg-blue-500/20 rounded-xl">
                         <Folder className="w-5 h-5 text-blue-400" />
                       </div>
                     </div>
-                    <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Категории</p>
-                    <p className="text-blue-400 font-bold text-2xl">{categories.length}</p>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Категории</p>
+                      <p className="text-blue-400 font-bold text-2xl">{categories.length}</p>
+                    </div>
                   </div>
                 </motion.div>
               </div>
