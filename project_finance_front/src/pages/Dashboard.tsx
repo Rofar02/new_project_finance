@@ -8,8 +8,9 @@ import { getStatistics, type Statistics } from '../api/statistics';
 import { IOSHeader } from '../components/ios/IOSHeader';
 import { IOSCard } from '../components/ios/IOSCard';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
+import { SkeletonBalanceCard, SkeletonCard } from '../components/shared/SkeletonCard';
 import { ErrorMessage } from '../components/shared/ErrorMessage';
-import { Plus, TrendingUp, TrendingDown, LogOut, BarChart3 } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, LogOut, BarChart3, Receipt, ArrowUpCircle, ArrowDownCircle, Folder } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import type { Category } from '../types';
@@ -149,9 +150,13 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-ios-dark">
+      <div className="min-h-screen bg-ios-dark pb-20">
         <IOSHeader title="Финансы" />
-        <LoadingSpinner />
+        <div className="p-4 space-y-4">
+          <SkeletonBalanceCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
@@ -187,37 +192,59 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <IOSCard>
-            <div className="text-center">
-              <p className="text-ios-text-tertiary text-sm mb-2">Общий баланс</p>
-              <h2 className={`text-4xl font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {balance >= 0 ? '+' : ''}
-                {balance.toLocaleString('ru-RU')} ₽
-              </h2>
-              <div className="flex items-center justify-center gap-4 mt-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-400" />
-                  <span className="text-ios-text-secondary text-sm">
-                    {(transactions || [])
-                      .filter((t) => t.transaction_type === 'income')
-                      .reduce((sum, t) => sum + t.amount, 0)
-                      .toLocaleString('ru-RU')}{' '}
-                    ₽
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingDown className="w-4 h-4 text-red-400" />
-                  <span className="text-ios-text-secondary text-sm">
-                    {(transactions || [])
-                      .filter((t) => t.transaction_type === 'expense')
-                      .reduce((sum, t) => sum + t.amount, 0)
-                      .toLocaleString('ru-RU')}{' '}
-                    ₽
-                  </span>
+          <div className="relative overflow-hidden rounded-ios-lg">
+            {/* Градиентный фон */}
+            <div 
+              className={`absolute inset-0 ${
+                balance >= 0 
+                  ? 'bg-gradient-to-br from-green-500/20 via-primary-500/20 to-purple-500/20' 
+                  : 'bg-gradient-to-br from-red-500/20 via-orange-500/20 to-pink-500/20'
+              }`}
+            />
+            {/* Эффект свечения */}
+            <div 
+              className={`absolute inset-0 ${
+                balance >= 0 
+                  ? 'bg-gradient-to-r from-green-500/10 via-transparent to-primary-500/10' 
+                  : 'bg-gradient-to-r from-red-500/10 via-transparent to-orange-500/10'
+              }`}
+            />
+            <IOSCard className="relative bg-ios-dark-secondary/60 backdrop-blur-xl border-0">
+              <div className="text-center relative z-10">
+                <p className="text-ios-text-tertiary text-sm mb-2 font-medium">Общий баланс</p>
+                <h2 className={`text-5xl font-bold mb-1 ${
+                  balance >= 0 
+                    ? 'bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent' 
+                    : 'bg-gradient-to-r from-red-400 to-orange-300 bg-clip-text text-transparent'
+                }`}>
+                  {balance >= 0 ? '+' : ''}
+                  {balance.toLocaleString('ru-RU')} ₽
+                </h2>
+                <div className="flex items-center justify-center gap-6 mt-6">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full border border-green-500/20">
+                    <TrendingUp className="w-4 h-4 text-green-400" />
+                    <span className="text-green-400 font-semibold text-sm">
+                      {(transactions || [])
+                        .filter((t) => t.transaction_type === 'income')
+                        .reduce((sum, t) => sum + t.amount, 0)
+                        .toLocaleString('ru-RU')}{' '}
+                      ₽
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 px-4 py-2 bg-red-500/10 rounded-full border border-red-500/20">
+                    <TrendingDown className="w-4 h-4 text-red-400" />
+                    <span className="text-red-400 font-semibold text-sm">
+                      {(transactions || [])
+                        .filter((t) => t.transaction_type === 'expense')
+                        .reduce((sum, t) => sum + t.amount, 0)
+                        .toLocaleString('ru-RU')}{' '}
+                      ₽
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </IOSCard>
+            </IOSCard>
+          </div>
         </motion.div>
 
         {/* Статистика с бэкенда */}
@@ -232,53 +259,77 @@ export function Dashboard() {
                 <BarChart3 className="w-5 h-5 text-primary-500" />
                 <h3 className="text-lg font-semibold text-ios-text">Статистика</h3>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div 
+              <div className="grid grid-cols-2 gap-3">
+                <motion.div 
                   onClick={() => {
                     hapticFeedback('light');
                     navigate('/transactions');
                   }}
-                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                  whileTap={{ scale: 0.95 }}
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-primary-500/10 to-purple-500/10 rounded-ios-lg cursor-pointer border border-primary-500/20 active:opacity-80 transition-all"
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-primary-500/20 rounded-lg">
+                      <Receipt className="w-4 h-4 text-primary-400" />
+                    </div>
+                  </div>
                   <p className="text-ios-text-tertiary text-xs mb-1">Всего транзакций</p>
-                  <p className="text-ios-text font-semibold text-lg">
+                  <p className="text-ios-text font-bold text-xl">
                     {statistics.transactions_count || 0}
                   </p>
-                </div>
-                <div 
+                </motion.div>
+                <motion.div 
                   onClick={() => {
                     hapticFeedback('light');
                     navigate('/transactions?type=income');
                   }}
-                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                  whileTap={{ scale: 0.95 }}
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-ios-lg cursor-pointer border border-green-500/20 active:opacity-80 transition-all"
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                      <ArrowUpCircle className="w-4 h-4 text-green-400" />
+                    </div>
+                  </div>
                   <p className="text-ios-text-tertiary text-xs mb-1">Доходов</p>
-                  <p className="text-green-400 font-semibold text-lg">
+                  <p className="text-green-400 font-bold text-xl">
                     {statistics.income_count || 0}
                   </p>
-                </div>
-                <div 
+                </motion.div>
+                <motion.div 
                   onClick={() => {
                     hapticFeedback('light');
                     navigate('/transactions?type=expense');
                   }}
-                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                  whileTap={{ scale: 0.95 }}
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-red-500/10 to-orange-500/10 rounded-ios-lg cursor-pointer border border-red-500/20 active:opacity-80 transition-all"
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-red-500/20 rounded-lg">
+                      <ArrowDownCircle className="w-4 h-4 text-red-400" />
+                    </div>
+                  </div>
                   <p className="text-ios-text-tertiary text-xs mb-1">Расходов</p>
-                  <p className="text-red-400 font-semibold text-lg">
+                  <p className="text-red-400 font-bold text-xl">
                     {statistics.expense_count || 0}
                   </p>
-                </div>
-                <div 
+                </motion.div>
+                <motion.div 
                   onClick={() => {
                     hapticFeedback('light');
                     navigate('/categories');
                   }}
-                  className="text-center p-3 bg-ios-dark-tertiary rounded-ios-lg cursor-pointer active:opacity-50 transition-opacity"
+                  whileTap={{ scale: 0.95 }}
+                  className="relative overflow-hidden p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-ios-lg cursor-pointer border border-blue-500/20 active:opacity-80 transition-all"
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <Folder className="w-4 h-4 text-blue-400" />
+                    </div>
+                  </div>
                   <p className="text-ios-text-tertiary text-xs mb-1">Категорий</p>
-                  <p className="text-primary-500 font-semibold text-lg">{categories.length}</p>
-                </div>
+                  <p className="text-blue-400 font-bold text-xl">{categories.length}</p>
+                </motion.div>
               </div>
             </IOSCard>
           </motion.div>
