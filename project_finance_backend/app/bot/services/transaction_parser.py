@@ -6,8 +6,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Вариации для типа транзакции
-EXPENSE_KEYWORDS = ["расход", "расходы", "трата", "траты", "потратил", "потрачено", "потратить"]
-INCOME_KEYWORDS = ["доход", "доходы", "зарплата", "получил", "получено", "получить"]
+EXPENSE_KEYWORDS = [
+    "расход", "расходы", "расх", "расходов",
+    "трата", "траты", "трат",
+    "потратил", "потрачено", "потратить", "потратила"
+]
+INCOME_KEYWORDS = [
+    "доход", "доходы", "дох", "доходов",
+    "зарплата", "зарплату", "зарплаты",
+    "получил", "получила", "получено", "получить"
+]
 
 # Словарь русских числительных
 RUSSIAN_NUMBERS = {
@@ -86,8 +94,10 @@ def parse_transaction_text(text: str) -> Optional[Tuple[TransactionType, float, 
         logger.warning(f"Could not find amount in text: {text}")
         return None
     
-    # Извлекаем категорию (текст после "на" или "для")
+    # Извлекаем категорию (текст после "на" или "для", либо после суммы)
     category_text = None
+    
+    # Сначала пытаемся найти через разделители (" на ", " для ")
     for separator in [" на ", " для ", " категория "]:
         if separator in text:
             parts = text.split(separator, 1)
@@ -97,16 +107,23 @@ def parse_transaction_text(text: str) -> Optional[Tuple[TransactionType, float, 
                 category_text = re.sub(r'\s+(на|для|категория).*$', '', category_text, flags=re.IGNORECASE)
                 break
     
-    # Если не нашли через разделители, пытаемся извлечь последнее слово/слова после суммы
+    # Если не нашли через разделители, извлекаем все что после суммы
     if not category_text:
-        # Убираем тип и сумму, что осталось - категория
+        # Убираем тип транзакции (все ключевые слова)
         text_clean = text
         for keyword in EXPENSE_KEYWORDS + INCOME_KEYWORDS:
-            text_clean = text_clean.replace(keyword, "")
-        text_clean = re.sub(amount_pattern, "", text_clean)
+            # Заменяем с пробелами вокруг, чтобы не затронуть части других слов
+            text_clean = re.sub(rf'\b{re.escape(keyword)}\b', '', text_clean, flags=re.IGNORECASE)
+        
+        # Убираем сумму (число и "тысяч")
+        text_clean = re.sub(r'\d+(?:[.,]\d+)?', '', text_clean)  # Убираем числа
+        text_clean = re.sub(r'\s*(тысяч|тысячи|тысяча)\s*', '', text_clean, flags=re.IGNORECASE)  # Убираем "тысяч"
+        
+        # Убираем разделители которые могли остаться
+        text_clean = re.sub(r'^(на|для|категория)\s+', '', text_clean, flags=re.IGNORECASE)
+        text_clean = re.sub(r'\s+(на|для|категория)\s+', ' ', text_clean, flags=re.IGNORECASE)
+        
         category_text = text_clean.strip()
-        # Убираем лишние слова
-        category_text = re.sub(r'^(на|для|категория)\s+', '', category_text, flags=re.IGNORECASE)
     
     if not category_text or len(category_text) < 2:
         logger.warning(f"Could not extract category from text: {text}")
