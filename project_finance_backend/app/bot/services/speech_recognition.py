@@ -36,8 +36,18 @@ async def transcribe_audio_file(audio_path: str, model_name: str = "tiny") -> Op
         model = load_whisper_model(model_name)
         logger.info(f"Transcribing audio file: {audio_path}")
         
-        # Распознавание речи
-        result = model.transcribe(audio_path, language="ru")
+        # Распознавание речи с подсказкой для лучшего распознавания чисел
+        # Важно: числа должны распознаваться как цифры, а не словами
+        initial_prompt = (
+            "Расход 1456 на продукты. Доход 5000 зарплата. "
+            "Расход 8234 на коммунальные. Доход 10000 бонус. "
+            "Расход 250 на транспорт. Доход 3000 подарок."
+        )
+        result = model.transcribe(
+            audio_path, 
+            language="ru",
+            initial_prompt=initial_prompt
+        )
         text = result["text"].strip()
         
         logger.info(f"Transcribed text: {text}")

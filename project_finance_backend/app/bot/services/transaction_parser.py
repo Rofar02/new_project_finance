@@ -60,31 +60,52 @@ def parse_transaction_text(text: str) -> Optional[Tuple[TransactionType, float, 
     amount = None
     
     # Сначала ищем паттерн: число + "тысяч"/"тысячи"/"тысяча" (приоритет)
-    thousands_pattern = r'(\d+)\s*(тысяч|тысячи|тысяча)'
+    # Поддерживаем числа с пробелами и разделителями: "1 000", "5,000", "10000"
+    thousands_pattern = r'(\d+(?:[ ,.\u00A0]\d+)?)\s*(тысяч|тысячи|тысяча)'
     thousands_match = re.search(thousands_pattern, text)
     if thousands_match:
-        base_number = int(thousands_match.group(1))
-        amount = base_number * 1000
+        base_number_str = thousands_match.group(1).replace(' ', '').replace(',', '').replace('\u00A0', '').replace('.', '')
+        try:
+            base_number = int(base_number_str)
+            amount = base_number * 1000
+        except ValueError:
+            pass
     
     # Если не нашли "число + тысяч", ищем числительные + "тысяч"
     if amount is None:
         thousands_words = ["тысяч", "тысячи", "тысяча"]
         for num_word, num_value in RUSSIAN_NUMBERS.items():
             for thousand_word in thousands_words:
-                pattern = rf'{num_word}\s+{thousand_word}'
+                pattern = rf'\b{num_word}\s+{thousand_word}\b'
                 if re.search(pattern, text):
                     amount = num_value * 1000
                     break
             if amount:
                 break
     
-    # Если не нашли "тысяч", ищем просто цифры
+    # Если не нашли "тысяч", ищем просто цифры (поддержка разных форматов)
     if amount is None:
-        amount_pattern = r'(\d+(?:[.,]\d+)?)'
+        # Поддерживаем: "1000", "1 000", "1,000", "1000.50"
+        # Ищем числа с разделителями тысяч (пробел, запятая, точка, неразрывный пробел)
+        amount_pattern = r'(\d{1,3}(?:[ ,.\u00A0]\d{3})*(?:[.,]\d+)?|\d+(?:[.,]\d+)?)'
         amount_matches = re.findall(amount_pattern, text)
         if amount_matches:
             # Берем первое найденное число
-            amount_str = amount_matches[0].replace(',', '.')
+            amount_str = amount_matches[0]
+            # Убираем разделители тысяч (пробелы, неразрывные пробелы)
+            amount_str = amount_str.replace(' ', '').replace('\u00A0', '')
+            # Обрабатываем запятые и точки
+            # Если есть запятая, она может быть разделителем тысяч или десятичным разделителем
+            if ',' in amount_str:
+                parts = amount_str.split(',')
+                if len(parts) == 2 and len(parts[1]) <= 2:
+                    # После запятой 1-2 цифры - это десятичный разделитель (копейки)
+                    amount_str = '.'.join(parts)
+                else:
+                    # Иначе запятая - разделитель тысяч, убираем все запятые
+                    amount_str = ''.join(parts)
+            # Заменяем запятую на точку для десятичных (если остались)
+            amount_str = amount_str.replace(',', '.')
             try:
                 amount = float(amount_str)
             except ValueError:
