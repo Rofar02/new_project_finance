@@ -16,6 +16,10 @@ RUN pip install --no-cache-dir poetry && \
 # Копирование файлов зависимостей
 COPY pyproject.toml ./
 
+# Устанавливаем CPU-only версию PyTorch ПЕРЕД установкой остальных зависимостей
+# Это предотвратит установку CUDA пакетов (~3GB экономии)
+RUN pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+
 # Установка зависимостей (включая dev)
 RUN poetry install --no-interaction --no-ansi
 
