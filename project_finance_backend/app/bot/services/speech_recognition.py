@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 _whisper_model = None
 
 
-def load_whisper_model(model_name: str = "base"):
+def load_whisper_model(model_name: str = "tiny"):
     """Загружает модель Whisper (загружается один раз)"""
     global _whisper_model
     if _whisper_model is None:
@@ -21,7 +21,7 @@ def load_whisper_model(model_name: str = "base"):
     return _whisper_model
 
 
-async def transcribe_audio_file(audio_path: str, model_name: str = "base") -> Optional[str]:
+async def transcribe_audio_file(audio_path: str, model_name: str = "tiny") -> Optional[str]:
     """
     Распознает речь в аудиофайле используя Whisper
     

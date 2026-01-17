@@ -16,12 +16,15 @@ COPY pyproject.toml ./
 RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false
 
-# Устанавливаем CPU-only версию PyTorch ПЕРЕД установкой остальных зависимостей
-# Это предотвратит установку CUDA пакетов (~3GB экономии)
-RUN pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+# Устанавливаем CPU-only версию PyTorch ПЕРЕД poetry install
+# Это предотвратит установку CUDA пакетов через poetry (~3GB экономии)
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch torchaudio
 
-# Установка зависимостей Python
+# Установка зависимостей Python (БЕЗ whisper в pyproject.toml)
 RUN poetry install --no-dev --no-interaction --no-ansi
+
+# Устанавливаем Whisper ПОСЛЕ poetry install (torch уже установлен)
+RUN pip install --no-cache-dir openai-whisper
 
 # Копирование кода приложения
 COPY . .
