@@ -10,3 +10,4 @@ class VoiceTransactionStates(StatesGroup):
     # Ожидание подтверждения транзакции
     confirming_transaction = State()
 
+

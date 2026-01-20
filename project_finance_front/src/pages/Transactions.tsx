@@ -8,7 +8,7 @@ import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import { ErrorMessage } from '../components/shared/ErrorMessage';
 import { EditTransactionModal } from '../components/shared/EditTransactionModal';
 import { EmptyState } from '../components/shared/EmptyState';
-import { Plus, Trash2, ArrowUpRight, ArrowDownRight, Home, Edit, Receipt } from 'lucide-react';
+import { Trash2, ArrowUpRight, ArrowDownRight, Home, Edit, Receipt } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { hapticFeedback, showNotification } from '../utils/telegram';
 import type { Transaction } from '../types';
@@ -51,13 +51,20 @@ export function Transactions() {
 
   const handleSwipe = (id: number, direction: 'left' | 'right') => {
     if (swipedId === id && swipeDirection === direction) {
+      // Закрываем свайп
       setSwipedId(null);
       setSwipeDirection(null);
     } else {
+      // Открываем свайп
       setSwipedId(id);
       setSwipeDirection(direction);
       hapticFeedback('light');
     }
+  };
+
+  const handleSwipeClose = () => {
+    setSwipedId(null);
+    setSwipeDirection(null);
   };
 
   const handleEdit = (transaction: Transaction) => {
@@ -110,7 +117,7 @@ export function Transactions() {
   };
 
   return (
-    <div className="min-h-screen bg-ios-dark pb-20">
+    <div className="min-h-screen bg-ios-dark">
       <IOSHeader 
         title={getTitle()} 
         showBack
@@ -171,7 +178,14 @@ export function Transactions() {
                   isSwiped={swipedId === transaction.id}
                   swipeDirection={swipeDirection}
                   isDeleting={deletingId === transaction.id}
-                  onSwipe={(direction) => handleSwipe(transaction.id, direction)}
+                  onSwipe={(direction) => {
+                    // Если уже свайпнут в том же направлении - закрываем
+                    if (swipedId === transaction.id && swipeDirection === direction) {
+                      handleSwipeClose();
+                    } else {
+                      handleSwipe(transaction.id, direction);
+                    }
+                  }}
                   onDelete={() => handleDelete(transaction.id)}
                   onEdit={() => handleEdit(transaction)}
                 />
@@ -180,22 +194,6 @@ export function Transactions() {
           ))
         )}
       </div>
-
-      {/* Кнопка добавления */}
-      <motion.button
-        onClick={() => {
-          hapticFeedback('light');
-          navigate('/add-transaction');
-        }}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-primary-500 to-purple-500 rounded-full flex items-center justify-center shadow-xl active:scale-95 transition-all hover:shadow-2xl"
-        whileTap={{ scale: 0.9 }}
-        whileHover={{ scale: 1.05 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      >
-        <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-      </motion.button>
 
       {/* Модальное окно редактирования */}
       <EditTransactionModal
@@ -264,24 +262,25 @@ function TransactionItem({
       <motion.div
         drag="x"
         dragConstraints={{ left: -60, right: 60 }}
-        dragElastic={0.1}
+        dragElastic={0.2}
+        dragMomentum={false}
         onDragEnd={(_, info) => {
-          if (info.offset.x < -30) {
-            // Свайп влево больше 30px - показываем кнопку редактирования
+          const threshold = 40; // Увеличен порог для более четкого срабатывания
+          
+          if (info.offset.x < -threshold) {
+            // Свайп влево - показываем кнопку редактирования
             if (!isSwiped || swipeDirection !== 'left') {
               onSwipe('left');
-              hapticFeedback('light');
             }
-          } else if (info.offset.x > 30) {
-            // Свайп вправо больше 30px - показываем кнопку удаления
+          } else if (info.offset.x > threshold) {
+            // Свайп вправо - показываем кнопку удаления
             if (!isSwiped || swipeDirection !== 'right') {
               onSwipe('right');
-              hapticFeedback('light');
             }
           } else {
-            // Возвращаем на место
+            // Возвращаем на место, если смещение меньше порога
             if (isSwiped) {
-              onSwipe(swipeDirection || 'left');
+              onSwipe(swipeDirection || 'left'); // Тoggle для закрытия
             }
           }
         }}
@@ -292,8 +291,8 @@ function TransactionItem({
         }}
         transition={{
           type: 'spring',
-          stiffness: 300,
-          damping: 30,
+          stiffness: 400,
+          damping: 35,
         }}
         className="relative z-20"
         whileTap={{ scale: 0.98 }}
@@ -302,7 +301,7 @@ function TransactionItem({
           className="cursor-pointer"
           onClick={() => {
             if (isSwiped) {
-              onSwipe();
+              onSwipe(swipeDirection || 'left'); // Toggle для закрытия
             }
           }}
         >
